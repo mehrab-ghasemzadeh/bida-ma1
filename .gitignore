@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 
 data/raw/
+Houston/
+!Houston/PUT_HOUSTON_FILES_HERE.txt
 *.mat
 *.npy
 *.npz

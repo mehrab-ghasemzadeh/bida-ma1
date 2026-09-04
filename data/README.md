@@ -1,10 +1,24 @@
 # Data
 
-Put the downloaded scenes under `data/raw/` (any subdirectory layout — the files
-are found by name, case-insensitively). Then check what was found:
+Scene files are located **by name**, case-insensitively, by searching the config's
+`dataset.root` and then the project root and `data/raw/` (skipping `.venv`, `.git`,
+`runs`, …). So any of these work without further edits:
+
+```
+Houston/                     data/raw/Houston/          data/raw/
+  Houston13.mat                Houston13.mat              Houston13.mat
+  Houston13_7gt.mat            Houston13_7gt.mat          Houston13_7gt.mat
+  Houston18.mat                Houston18.mat              Houston18.mat
+  Houston18_7gt.mat            Houston18_7gt.mat          Houston18_7gt.mat
+```
+
+`configs/houston.yaml` uses `root: Houston` — the folder at the project root.
+**Houston13 is the source domain, Houston18 the target.**
+
+Check what was found before training:
 
 ```bash
-python tools/inspect_data.py --root data/raw
+python tools/inspect_data.py --root Houston
 python tools/inspect_data.py --config configs/houston.yaml
 ```
 
@@ -20,7 +34,7 @@ Source and target scenes must use the **same class indices** and, unless
 
 ## Benchmarks the registry knows about
 
-| config name | scenes | bands | classes | expected files |
+| config name | source → target | bands | classes | expected files |
 |---|---|---|---|---|
 | `houston` | Houston 2013 → Houston 2018 | 48 | 7 | `Houston13.mat`, `Houston13_7gt.mat`, `Houston18.mat`, `Houston18_7gt.mat` |
 | `pavia` | Pavia University → Pavia Centre | 102 | 7 | `paviaU.mat`, `paviaU_7gt.mat`, `pavia.mat`, `pavia_7gt.mat` |

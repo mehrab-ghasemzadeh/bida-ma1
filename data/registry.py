@@ -15,6 +15,7 @@ still resolve; anything unusual can be pointed at explicitly from the config wit
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
@@ -85,19 +86,48 @@ DATASETS: Dict[str, Dict] = {
 }
 
 
+# Directories that are never worth walking when looking for scene files.
+_SKIP_DIRS = {
+    ".git", ".venv", "venv", "env", "__pycache__", "runs", "checkpoints",
+    "logs", "node_modules", ".idea", ".vscode", "site-packages",
+}
+
+
 def _find_file(root: Path, candidates: Sequence[str]) -> Optional[Path]:
     """Search `root` recursively for the first matching candidate (case-insensitive)."""
-    wanted = {c.lower(): c for c in candidates}
-    for path in sorted(root.rglob("*")):
-        if path.is_file() and path.name.lower() in wanted:
-            return path
+    wanted = {c.lower() for c in candidates}
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = sorted(d for d in dirnames if d not in _SKIP_DIRS
+                             and not d.startswith("."))
+        for filename in sorted(filenames):
+            if filename.lower() in wanted:
+                return Path(dirpath) / filename
     return None
+
+
+def candidate_roots(root: str | Path) -> List[Path]:
+    """Where to look for scene files, in order.
+
+    The configured root comes first; the project root and `data/raw` follow, so a
+    scene folder dropped next to the code (e.g. `Houston/`) is found without
+    editing the config.
+    """
+    here = Path(__file__).resolve().parents[1]
+    ordered = [Path(root), here / Path(root), here, here / "data" / "raw", Path.cwd()]
+    seen, out = set(), []
+    for path in ordered:
+        resolved = path.resolve()
+        if resolved not in seen and path.exists():
+            seen.add(resolved)
+            out.append(path)
+    return out
 
 
 def resolve_dataset(cfg: Dict, data_root: str | Path = "data/raw") -> Dict:
     """Turn a dataset config into concrete file paths, keys and class metadata."""
     name = str(cfg.get("name", "custom")).lower()
     root = Path(cfg.get("root", data_root))
+    roots = candidate_roots(root)
 
     explicit = {
         field: cfg.get(field)
@@ -123,17 +153,20 @@ def resolve_dataset(cfg: Dict, data_root: str | Path = "data/raw") -> Dict:
             if explicit[field]:
                 resolved[field] = Path(explicit[field])
                 continue
-            if not root.exists():
-                problems.append(f"{field}: data root '{root}' does not exist")
+            if not roots:
+                problems.append(f"{field}: no searchable data root (tried '{root}')")
                 continue
-            found = _find_file(root, spec[field])
+            found = next(
+                (hit for hit in (_find_file(r, spec[field]) for r in roots) if hit), None
+            )
             if found is None:
-                problems.append(f"{field}: none of {spec[field]} found under '{root}'")
+                problems.append(f"{field}: none of {spec[field]} found")
             else:
                 resolved[field] = found
         if problems:
+            searched = ", ".join(f"'{r}'" for r in roots) or f"'{root}'"
             raise FileNotFoundError(
-                f"Could not locate the '{name}' dataset files:\n  "
+                f"Could not locate the '{name}' dataset files (searched {searched}):\n  "
                 + "\n  ".join(problems)
                 + "\nSee data/README.md for the expected layout."
             )

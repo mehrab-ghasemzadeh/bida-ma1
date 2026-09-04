@@ -1,6 +1,10 @@
 _base_: default.yaml
 
 output_dir: runs/houston
+
 dataset:
   name: houston
-  root: data/raw
+  # Houston/
+  #   Houston13.mat      + Houston13_7gt.mat   -> source domain
+  #   Houston18.mat      + Houston18_7gt.mat   -> target domain
+  root: Houston
