@@ -1,0 +1,25 @@
+# Tiny synthetic run used to check that every component is wired up.
+_base_: default.yaml
+
+output_dir: runs/smoke
+
+dataset:
+  synthetic: true
+  synthetic_size: 64
+  num_classes: 7
+  spectral_reduction: none
+
+train:
+  epochs: 2
+  batch_size: 16
+  eval_batch_size: 128
+  num_workers: 0
+  log_every: 10
+  lr_warmup_epochs: 0
+
+loss:
+  dist_warmup_epochs: 1
+
+model:
+  teacher:
+    window: 4

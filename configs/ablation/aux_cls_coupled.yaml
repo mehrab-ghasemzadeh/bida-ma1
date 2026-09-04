@@ -1,0 +1,10 @@
+# Auxiliary cross-entropy on the coupled source representation h_{s<-t}.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/aux_cls_coupled
+
+model:
+  aux_cls_on_coupled: true
+
+loss:
+  lambda_aux_cls: 0.5

@@ -1,0 +1,8 @@
+# Row 6: the full model (identical to configs/default.yaml).
+_base_: ../default.yaml
+
+output_dir: runs/ablation/full
+
+model:
+  teacher:
+    mode: hma

@@ -1,0 +1,9 @@
+# Q6: EMA teacher instead of the HMA teacher.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/ema_teacher
+
+model:
+  teacher:
+    mode: ema
+    ema_decay: 0.999

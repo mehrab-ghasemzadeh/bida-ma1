@@ -1,0 +1,8 @@
+# Routing study: Top-1 instead of Top-2.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/top1
+
+model:
+  moe:
+    top_k: 1

@@ -1,0 +1,97 @@
+# Full model: semantic tokenizer + Top-2 MoE Transformers + bidirectional coupled
+# Transformer + HMA teacher distillation.
+seed: 0
+deterministic: false
+output_dir: runs/default
+
+dataset:
+  name: houston            # houston | pavia | shanghai_hangzhou | hyrank | custom
+  root: data/raw           # searched recursively for the benchmark files
+  synthetic: false         # true generates random scenes (smoke tests only)
+  normalisation: standard  # standard | minmax | global | none
+  spectral_reduction: pca  # pca | select | head | average | none
+  samples_per_class: null  # e.g. 180 to use N labelled source samples per class
+  target_pixels: labelled  # labelled | all  (target labels are never used to train)
+  target_max_samples: null
+  augment: false           # rotation / flip augmentation of the patches
+  val_fraction: 0.0        # held-out fraction of the source set, for model selection
+
+model:
+  patch_size: 13
+  num_bands: 13
+  embed_dim: 64            # D
+  num_tokens: 5            # semantic tokens per patch
+  depth: 2                 # Transformer blocks per domain encoder
+  coupled_depth: 1         # bidirectional cross-attention layers
+  num_heads: 4
+  dropout: 0.1
+  attn_dropout: 0.1
+  norm_style: post         # post (as specified) | pre
+  positional_encoding: learned
+  pool: mean               # mean | max | cls
+  classifier_hidden_ratio: 0.5
+
+  use_moe: true
+  use_coupled: true
+  use_distillation: true
+  inference_mode: A        # A: classify h_t | B: classify h_{t<-s} (needs source data)
+  aux_cls_on_coupled: false  # extra CE on the coupled source representation
+
+  share_tokenizer: false
+  share_positional: false
+  share_encoder: false
+
+  tokenizer:
+    conv3d_channels: [8, 16]
+    kernel3d: 2
+    kernel2d: 2
+    dropout: 0.0
+    softmax_over: spatial  # attention normalised over spatial positions
+
+  moe:
+    num_experts: 4
+    top_k: 2
+    hidden_mult: 2.0       # expert hidden dimension = hidden_mult * D
+    balance_mode: soft     # soft | hard | switch  (see losses/moe_balance_loss.py)
+    noise_std: 0.0
+
+  teacher:
+    mode: hma              # hma | ema | frozen | copy
+    window: 16             # HMA window n
+    ema_decay: 0.999
+    update_every: 1
+    history_device: same   # same | cpu  (cpu saves GPU memory for large windows)
+
+loss:
+  lambda_dist: 1.0
+  dist_warmup_epochs: 10
+  dist_delay_epochs: 0
+  dist_warmup_granularity: epoch
+  lambda_balance: 0.01
+  lambda_aux_cls: 0.0
+  distillation_distance: cosine   # cosine | mse | smooth_l1 | normalised_mse
+  symmetric_distillation: false
+  label_smoothing: 0.0
+
+train:
+  epochs: 100
+  batch_size: 64
+  eval_batch_size: 512
+  num_workers: 0
+  pin_memory: false
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+  lr_scheduler: cosine     # cosine | step | none
+  lr_warmup_epochs: 5
+  min_lr_ratio: 0.01
+  lr_step_size: 30
+  lr_gamma: 0.5
+  grad_clip: 1.0
+  amp: false
+  eval_every: 1
+  log_every: 50
+  source_only: false
+  # target_oa follows the common protocol of the cross-scene literature but does
+  # peek at target labels; use "last" or "source_val_oa" for a stricter protocol.
+  model_selection: target_oa

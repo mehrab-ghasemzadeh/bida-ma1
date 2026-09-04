@@ -1,0 +1,6 @@
+_base_: default.yaml
+
+output_dir: runs/pavia
+dataset:
+  name: pavia
+  root: data/raw

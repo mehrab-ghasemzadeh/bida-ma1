@@ -1,0 +1,9 @@
+# Row 4: bidirectional coupled cross-attention, no distillation loss.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/coupled
+
+model:
+  use_moe: true
+  use_coupled: true
+  use_distillation: false

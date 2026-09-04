@@ -1,0 +1,6 @@
+_base_: default.yaml
+
+output_dir: runs/shanghai_hangzhou
+dataset:
+  name: shanghai_hangzhou
+  root: data/raw

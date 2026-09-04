@@ -1,0 +1,12 @@
+# Row 2: Transformer encoder with a plain FFN, source-only training.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/transformer
+
+model:
+  use_moe: false
+  use_coupled: false
+  use_distillation: false
+
+train:
+  source_only: true

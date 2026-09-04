@@ -1,0 +1,12 @@
+# Row 3: Top-2 MoE replaces the FFN, still source-only.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/moe
+
+model:
+  use_moe: true
+  use_coupled: false
+  use_distillation: false
+
+train:
+  source_only: true

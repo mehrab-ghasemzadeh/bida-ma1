@@ -1,0 +1,14 @@
+# Row 1 of the ablation table: CNN tokenizer + classifier, trained on source only.
+# depth: 0 removes the Transformer entirely, so this is the pure-CNN baseline.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/source_only
+
+model:
+  depth: 0
+  use_moe: false
+  use_coupled: false
+  use_distillation: false
+
+train:
+  source_only: true

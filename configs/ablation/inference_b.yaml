@@ -1,0 +1,7 @@
+# Inference Option B: classify the coupled target representation h_{t<-s}.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/inference_b
+
+model:
+  inference_mode: B

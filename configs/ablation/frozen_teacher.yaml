@@ -1,0 +1,8 @@
+# Q6: teacher frozen at initialisation (Phase 8 plumbing check).
+_base_: ../default.yaml
+
+output_dir: runs/ablation/frozen_teacher
+
+model:
+  teacher:
+    mode: frozen

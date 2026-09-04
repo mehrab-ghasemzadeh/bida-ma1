@@ -1,0 +1,10 @@
+# Shared source/target branches: the "fully shared encoders" variant of section 9.
+# Ties h_t to the classifier feature space directly (see the README note).
+_base_: ../default.yaml
+
+output_dir: runs/ablation/shared_branches
+
+model:
+  share_tokenizer: true
+  share_positional: true
+  share_encoder: true

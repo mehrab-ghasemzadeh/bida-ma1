@@ -1,0 +1,8 @@
+# Expert-count study: 8 experts.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/experts_8
+
+model:
+  moe:
+    num_experts: 8

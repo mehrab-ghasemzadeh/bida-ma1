@@ -1,0 +1,9 @@
+# Row 5: distillation against an unsmoothed stop-gradient teacher (no HMA).
+_base_: ../default.yaml
+
+output_dir: runs/ablation/distillation
+
+model:
+  use_distillation: true
+  teacher:
+    mode: copy

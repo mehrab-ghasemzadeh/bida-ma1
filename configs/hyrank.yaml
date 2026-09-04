@@ -1,0 +1,6 @@
+_base_: default.yaml
+
+output_dir: runs/hyrank
+dataset:
+  name: hyrank
+  root: data/raw

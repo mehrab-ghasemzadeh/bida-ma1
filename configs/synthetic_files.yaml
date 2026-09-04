@@ -1,0 +1,27 @@
+# Trains on the .mat files produced by tools/make_synthetic_data.py.
+# Exercises the real loading path (mat files, PCA reduction to 13 bands).
+_base_: default.yaml
+
+output_dir: runs/synthetic_files
+
+dataset:
+  name: custom
+  source_image: data/raw/synthetic/SynthSource.mat
+  source_gt: data/raw/synthetic/SynthSource_gt.mat
+  target_image: data/raw/synthetic/SynthTarget.mat
+  target_gt: data/raw/synthetic/SynthTarget_gt.mat
+  keys:
+    source_image: ori_data
+    source_gt: map
+    target_image: ori_data
+    target_gt: map
+  spectral_reduction: pca
+
+train:
+  epochs: 2
+  batch_size: 32
+  log_every: 20
+  lr_warmup_epochs: 0
+
+loss:
+  dist_warmup_epochs: 1

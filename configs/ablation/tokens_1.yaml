@@ -1,0 +1,7 @@
+# Token-count study: a single semantic token per patch.
+_base_: ../default.yaml
+
+output_dir: runs/ablation/tokens_1
+
+model:
+  num_tokens: 1
