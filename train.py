@@ -17,7 +17,7 @@ import torch
 from data import build_data, build_dataloaders
 from models import build_model
 from training import Trainer
-from utils import get_logger, load_config, set_seed
+from utils import get_logger, load_config, resolve_device, set_seed
 
 
 def parse_args() -> argparse.Namespace:
@@ -47,9 +47,7 @@ def main() -> None:
     logger = get_logger("cdhsi", output_dir / "train.log")
 
     set_seed(int(cfg.get("seed", 0)), bool(cfg.get("deterministic", False)))
-    device = torch.device(
-        args.device or ("cuda" if torch.cuda.is_available() else "cpu")
-    )
+    device = resolve_device(args.device)
 
     logger.info(f"config: {args.config}")
     if args.override:

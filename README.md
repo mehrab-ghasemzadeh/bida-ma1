@@ -27,6 +27,19 @@ pip install torch --index-url https://download.pytorch.org/whl/cu124   # match y
 pip install -r requirements.txt
 ```
 
+**Older GPUs.** A wheel only carries kernels for the architectures it was built
+for. CUDA 13 wheels start at sm_75 (Turing), so Pascal cards — GTX 10-series,
+sm_61 — and Volta need a cu126 or cu118 build:
+
+```bash
+pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cu126
+python -c "import torch; print(torch.cuda.get_arch_list())"   # want an sm_6x entry
+```
+
+Without it the run dies inside the first Conv3d with `FIND was unable to find an
+engine to execute this computation`. `utils/device.py` checks the compute
+capability at startup and reports this instead of letting it surface there.
+
 ## Check the installation
 
 ```bash

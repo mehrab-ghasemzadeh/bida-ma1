@@ -21,7 +21,7 @@ from evaluation import classification_map, evaluate, format_confusion_matrix, fo
 from evaluation.evaluate import summarise_expert_usage
 from models import build_model
 from models.moe import moe_usage
-from utils import Config, get_logger, load_config, set_seed
+from utils import Config, get_logger, load_config, resolve_device, set_seed
 
 
 def parse_args() -> argparse.Namespace:
@@ -54,7 +54,7 @@ def main() -> None:
             cfg.set_path(key.strip(), yaml.safe_load(value.strip()))
 
     set_seed(int(cfg.get("seed", 0)))
-    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    device = resolve_device(args.device)
 
     bundle = build_data(cfg)
     loaders = build_dataloaders(cfg, bundle)
